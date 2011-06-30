@@ -1,1 +1,14 @@
 A replacement for the ical2rem.pl script.
+
+I was using ical2rem.pl to pull data off my Google calendar and
+display it in wyrd, which I'm using on my laptop.  After a while I
+found a few shortcomings:
+- the parsing of the .ics file from Google took about 25 seconds (on
+  my Intel CoreII Duo T7100) during which the CPU was fully utilized
+- the script does not use the features of remind format, e.g. the
+  repeating events are created as multiple entries in the remind file
+
+The mycal2rem.pl is far from full implementation of the .ics format
+(RFC 5545), but currently it parses all events from my calendar just
+fine.  If you find a bug or you'd like to have new event type
+implemented, please contact me at mehturt (at) gmail (dot) com.
