@@ -5,7 +5,7 @@ use DateTime;
 
 my @month = ('None','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 my %weekday = ("SU" => 'Sun', "MO" => 'Mon', "TU" => 'Tue', "WE" => 'Wed', "TH" => 'Thu', "FR" => 'Fri', "SA" => 'Sat');
-my $timezone = "+0200";
+my $timezone = "CET";
 
 sub ParseDate
 {
@@ -38,7 +38,7 @@ sub ParseDate
 			);
 	}
 	else {
-#		print "Parsing date: >$date<\n";
+#		print "Parsing date: >$date< tz >$tzid<\n";
 		$dtstart = DateTime->new(
 			year => substr($date, 0, 4),
 			month => substr($date, 4, 2),
