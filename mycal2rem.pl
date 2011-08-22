@@ -6,6 +6,7 @@ use DateTime;
 my @month = ('None','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 my %weekday = ("SU" => 'Sun', "MO" => 'Mon', "TU" => 'Tue', "WE" => 'Wed', "TH" => 'Thu', "FR" => 'Fri', "SA" => 'Sat');
 my $timezone = "CET";
+my $debug = 0;
 
 sub ParseDate
 {
@@ -78,7 +79,7 @@ sub ParseRrule
 		$rule{'BYDAY'} = $2;
 	}
 	elsif ($rrule =~ /BYDAY=([^;]+)/) {
-		$rule{'BYDAY'} = $2;
+		$rule{'BYDAY'} = $1;
 	}
 
 	return %rule;
@@ -106,18 +107,20 @@ sub ParseEvent
 		}
 	}
 
-#	print "Event: $summary\n";
+	print "Event: $summary\n" if ($debug == 1);
 
 # FIXME ml
 	$dtstart->set_time_zone($timezone);
 
-#	printf "Start: %d.%d.%d %d:%02d:%02d\n",
-#		$dtstart->day,
-#		$dtstart->month,
-#		$dtstart->year,
-#		$dtstart->hour,
-#		$dtstart->min,
-#		$dtstart->sec;
+	if ($debug == 1) {
+		printf "Start: %d.%d.%d %d:%02d:%02d\n",
+			$dtstart->day,
+			$dtstart->month,
+			$dtstart->year,
+			$dtstart->hour,
+			$dtstart->min,
+			$dtstart->sec;
+	}
 
 	my $have_time = 1;
 	if ($dtstart->hour == 0 &&
@@ -135,6 +138,11 @@ sub ParseEvent
 		) {
 			print " " . $weekday{$rrule{'BYDAY'}} .
 				" " . $rrule{'BYDAYNBR'};
+		}
+		elsif ($rrule{'FREQ'} eq "WEEKLY"
+			&& $rrule{'BYDAY'} ne ""
+		) {
+			print " " . $weekday{$rrule{'BYDAY'}};
 		}
 		elsif ($rrule{'FREQ'} eq "YEARLY"
 			&& $rrule{'BYMONTH'} ne ""
