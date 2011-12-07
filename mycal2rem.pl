@@ -85,9 +85,34 @@ sub ParseRrule
 	return %rule;
 }
 
+sub ParseValarm
+{
+	my ($trigger);
+
+	while(<>)
+	{
+		chop;
+		chop;
+		if (/^END:VALARM$/) {
+			last;
+		}
+		elsif (/^ACTION:(.+)$/) {
+			if ($1 ne "DISPLAY") {
+				last;
+			}
+		}
+		elsif (/^TRIGGER:-P(\d+)DT(\d+)H(\d+)M\d+S$/) {
+			my $minutes = $2 * 60 + $3;
+			$trigger = "+$minutes";
+		}
+	}
+
+	return $trigger;
+}
+
 sub ParseEvent
 {
-	my ($dtstart, $summary, %rrule);
+	my ($dtstart, $summary, %rrule, $trigger);
 
 	while(<>)
 	{
@@ -102,12 +127,19 @@ sub ParseEvent
 		elsif (/^RRULE:(.*)/) {
 			%rrule = ParseRrule($1);
 		}
+		elsif (/^BEGIN:VALARM$/) {
+			my $l_trigger = ParseValarm;
+			if (!defined $trigger) {
+				$trigger = $l_trigger;
+			}
+		}
 		elsif (/^END:VEVENT/) {
 			last;
 		}
 	}
 
 	print "Event: $summary\n" if ($debug == 1);
+	print "Event trigger: $trigger\n" if (defined $trigger && $debug == 1);
 
 # FIXME ml
 	$dtstart->set_time_zone($timezone);
@@ -169,6 +201,9 @@ sub ParseEvent
 		printf " AT %d:%02d",
 			$dtstart->hour,
 			$dtstart->min;
+		if (defined $trigger) {
+			print " $trigger";
+		}
 	}
 
 	print " MSG $summary\n";
