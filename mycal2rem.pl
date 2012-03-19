@@ -112,7 +112,7 @@ sub ParseValarm
 
 sub ParseEvent
 {
-	my ($dtstart, $summary, %rrule, $trigger);
+	my ($dtstart, $dtend, $summary, %rrule, $trigger);
 
 	while(<>)
 	{
@@ -120,6 +120,9 @@ sub ParseEvent
 		chop;
 		if (/^DTSTART(.*)/) {
 			$dtstart = ParseDate($1);
+		}
+		elsif (/^DTEND(.*)/) {
+			$dtend = ParseDate($1);
 		}
 		elsif (/^SUMMARY:(.*)/ && !defined $summary) {
 			$summary = $1;
@@ -144,6 +147,8 @@ sub ParseEvent
 # FIXME ml
 	$dtstart->set_time_zone($timezone);
 
+	my $duration = $dtend - $dtstart;
+
 	if ($debug == 1) {
 		printf "Start: %d.%d.%d %d:%02d:%02d\n",
 			$dtstart->day,
@@ -152,6 +157,17 @@ sub ParseEvent
 			$dtstart->hour,
 			$dtstart->min,
 			$dtstart->sec;
+		printf "End: %d.%d.%d %d:%02d:%02d\n",
+			$dtend->day,
+			$dtend->month,
+			$dtend->year,
+			$dtend->hour,
+			$dtend->min,
+			$dtend->sec;
+
+		printf "Duration: %d:%02d\n",
+			$duration->hours,
+			$duration->minutes;
 	}
 
 	my $have_time = 1;
@@ -159,6 +175,13 @@ sub ParseEvent
 		$dtstart->min == 0 &&
 		$dtstart->sec == 0) {
 		$have_time = 0;
+	}
+
+	my $have_dur = 1;
+	if ($duration->hours == 0 &&
+		$duration->minutes == 0)
+	{
+		$have_dur = 0;
 	}
 	
 	print "REM";
@@ -204,6 +227,12 @@ sub ParseEvent
 		if (defined $trigger) {
 			print " $trigger";
 		}
+	}
+
+	if ($have_dur == 1) {
+		printf " DURATION %d:%02d",
+			$duration->hours,
+			$duration->minutes;
 	}
 
 	print " MSG $summary\n";
