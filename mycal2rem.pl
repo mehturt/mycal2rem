@@ -146,6 +146,7 @@ sub ParseEvent
 
 # FIXME ml
 	$dtstart->set_time_zone($timezone);
+	$dtend->set_time_zone($timezone);
 
 	my $duration = $dtend - $dtstart;
 
@@ -166,7 +167,7 @@ sub ParseEvent
 			$dtend->sec;
 
 		printf "Duration: %d:%02d\n",
-			$duration->hours,
+			$duration->days * 24 + $duration->hours,
 			$duration->minutes;
 	}
 
@@ -231,7 +232,7 @@ sub ParseEvent
 
 	if ($have_dur == 1) {
 		printf " DURATION %d:%02d",
-			$duration->hours,
+			$duration->days * 24 + $duration->hours,
 			$duration->minutes;
 	}
 
