@@ -2,6 +2,7 @@
 
 use strict;
 use DateTime;
+use Data::Dumper;
 
 my @month = ('None','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 my %weekday = ("SU" => 'Sun', "MO" => 'Mon', "TU" => 'Tue', "WE" => 'Wed', "TH" => 'Thu', "FR" => 'Fri', "SA" => 'Sat');
@@ -200,18 +201,25 @@ sub ParseEvent
 		) {
 			print " " . $weekday{$rrule{'BYDAY'}};
 		}
-		elsif ($rrule{'FREQ'} eq "YEARLY"
-			&& $rrule{'BYMONTH'} ne ""
-			&& $rrule{'BYMONTHDAY'} ne ""
-		) {
-			print " " . $month[$rrule{'BYMONTH'}] .
-				" " . $rrule{'BYMONTHDAY'};
+		elsif ($rrule{'FREQ'} eq "YEARLY")
+		{
+			if ($rrule{'BYMONTH'} ne ""
+				&& $rrule{'BYMONTHDAY'} ne ""
+			) {
+				print " " . $month[$rrule{'BYMONTH'}] .
+					" " . $rrule{'BYMONTHDAY'};
+			}
+			else
+			{
+				print " " . $month[$dtstart->month] .
+					" " . $dtstart->day;
+			}
 		}
 		elsif ($rrule{'BYMONTHDAY'} ne "") {
 			print " " . $rrule{'BYMONTHDAY'};
 		}
 		else {
-			die;
+			die "Unsupported rrule: " . Dumper(\%rrule);
 		}
 	}
 	else {
